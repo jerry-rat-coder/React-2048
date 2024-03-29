@@ -200,18 +200,9 @@ export const useGame = (cellState: ICell[], setCellState: any) => {
   const canMoveRight = useCallback((): boolean => {
     return canMove(cellsByRow.map((row) => [...row].reverse()));
   }, [cellsByRow, canMove]);
-  useEffect(() => {
-    randomTile();
-    randomTile();
-  }, []);
 
-  useEffect(() => {
-    setupInput();
-    function setupInput() {
-      window.addEventListener("keydown", handleInput);
-    }
-
-    function handleInput(e: KeyboardEvent) {
+  const handleInput = useCallback(
+    (e: KeyboardEvent) => {
       switch (e.key) {
         case "ArrowUp":
           if (!canMoveUp()) {
@@ -248,7 +239,59 @@ export const useGame = (cellState: ICell[], setCellState: any) => {
       });
 
       return;
+    },
+    [tileState, canMove, moveUp, moveDown, moveLeft, moveRight]
+  );
+
+  useEffect(() => {
+    randomTile();
+    randomTile();
+  }, []);
+
+  useEffect(() => {
+    setupInput();
+    function setupInput() {
+      window.addEventListener("keydown", handleInput);
     }
+
+    // function handleInput(e: KeyboardEvent) {
+    //   switch (e.key) {
+    //     case "ArrowUp":
+    //       if (!canMoveUp()) {
+    //         return;
+    //       }
+    //       moveUp();
+    //       break;
+    //     case "ArrowDown":
+    //       if (!canMoveDown()) {
+    //         return;
+    //       }
+    //       moveDown();
+    //       break;
+    //     case "ArrowLeft":
+    //       if (!canMoveLeft()) {
+    //         return;
+    //       }
+    //       moveLeft();
+    //       break;
+    //     case "ArrowRight":
+    //       if (!canMoveRight()) {
+    //         return;
+    //       }
+    //       moveRight();
+    //       break;
+    //     default:
+    //       return;
+    //   }
+
+    //   delay(200).then(() => {
+    //     mergeTiles();
+
+    //     randomTile();
+    //   });
+
+    //   return;
+    // }
 
     return () => {
       window.removeEventListener("keydown", handleInput);
@@ -263,5 +306,6 @@ export const useGame = (cellState: ICell[], setCellState: any) => {
 
   return {
     tileState,
+    handleInput,
   };
 };

@@ -3,6 +3,7 @@ import { useGame } from "../hooks/useGame";
 import Cell, { ICell } from "./Cell";
 import Tile from "./Tile";
 import { v4 as uuidv4 } from "uuid";
+import DirectionPad from "./DirectionPad";
 const GRID_SIZE = 4;
 const CELL_SIZE = 16;
 const GRID_GAP = 2;
@@ -23,7 +24,7 @@ function createCells(): ICell[] {
 
 const Grid = () => {
   const [cellState, setCellState] = useState<ICell[]>(createCells());
-  const { tileState } = useGame(cellState, setCellState);
+  const { tileState, handleInput } = useGame(cellState, setCellState);
 
   const totalScore = useMemo(() => {
     const res = tileState.reduce((sum, tile) => {
@@ -61,6 +62,7 @@ const Grid = () => {
           );
         })}
       </div>
+      <DirectionPad handleInput={handleInput} />
     </>
   );
 };
