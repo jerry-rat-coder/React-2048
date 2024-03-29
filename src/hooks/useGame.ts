@@ -79,13 +79,12 @@ export const useGame = (cellState: ICell[], setCellState: any) => {
 
       return updatedCells;
     });
-  }, [cellState, tileState, setCellState, setTileState]);
+  }, [cellState, setCellState, setTileState]);
 
   const slideTiles = useCallback(
     (cells: Array<ICell[]>) => {
       let newCells = [...cells];
       let newTiles = [...tileState];
-      const newCellsState: ICell[] = [];
       cells.forEach((group) => {
         for (let i = 1; i < group.length; ++i) {
           const cell = group[i];
@@ -111,8 +110,8 @@ export const useGame = (cellState: ICell[], setCellState: any) => {
               )
             );
             newTiles = newTiles.map((tile) =>
-              tile.id === cell.tile?.id
-                ? { ...tile, x: lastValidCell?.x!, y: lastValidCell?.y! }
+              tile.id === cell.tile!.id
+                ? { ...tile, x: lastValidCell!.x!, y: lastValidCell!.y! }
                 : tile
             );
 
@@ -140,14 +139,14 @@ export const useGame = (cellState: ICell[], setCellState: any) => {
           mergeTile: undefined,
           tile: {
             ...cell.tile,
-            value: cell.tile?.value! + cell.mergeTile.value!,
+            value: cell.tile!.value! + cell.mergeTile.value!,
             x: cell.x!,
             y: cell.y!,
           },
         };
         setTileState((tiles) =>
           tiles
-            .filter((tile) => tile.id !== cell.mergeTile?.id)
+            .filter((tile) => tile.id !== cell.mergeTile!.id)
             .map((tile) =>
               tile.id === newCell.tile!.id ? newCell.tile! : tile
             )

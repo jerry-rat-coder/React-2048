@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useGame } from "../hooks/useGame";
 import Cell, { ICell } from "./Cell";
 import Tile from "./Tile";
@@ -47,7 +47,7 @@ const Grid = () => {
         {cellState.map((item) => (
           <Cell cell_size={CELL_SIZE} key={item.id} />
         ))}
-        {tileState.map((tile, index) => {
+        {tileState.map((tile) => {
           return (
             <Tile
               id={tile.id}
