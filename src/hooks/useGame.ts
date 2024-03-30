@@ -13,6 +13,11 @@ const canAccept = (cell: ICell, tile: ITile): boolean => {
 
 export const useGame = (cellState: ICell[], setCellState: any) => {
   const [tileState, setTileState] = useState<ITile[]>([]);
+  const [startX, setStartX] = useState(0);
+  const [startY, setStartY] = useState(0);
+  const [direction, setDirection] = useState("");
+  const [isMoving, setIsMoving] = useState(false);
+
   const cellsByColumn = useMemo(() => {
     const cells = [...cellState];
     const res: Array<ICell[]> = [];
@@ -202,46 +207,105 @@ export const useGame = (cellState: ICell[], setCellState: any) => {
   }, [cellsByRow, canMove]);
 
   const handleInput = useCallback(
-    (e: KeyboardEvent) => {
+    (e: any) => {
+      if (isMoving) {
+        return;
+      }
       switch (e.key) {
         case "ArrowUp":
           if (!canMoveUp()) {
+            setupInput();
             return;
           }
           moveUp();
           break;
         case "ArrowDown":
           if (!canMoveDown()) {
+            setupInput();
             return;
           }
           moveDown();
           break;
         case "ArrowLeft":
           if (!canMoveLeft()) {
+            setupInput();
             return;
           }
           moveLeft();
           break;
         case "ArrowRight":
           if (!canMoveRight()) {
+            setupInput();
             return;
           }
           moveRight();
           break;
         default:
+          setupInput();
           return;
       }
+      setIsMoving(() => true);
 
       delay(200).then(() => {
+        setIsMoving(() => false);
         mergeTiles();
 
         randomTile();
       });
 
+      setupInput();
+
       return;
     },
     [tileState, canMove, moveUp, moveDown, moveLeft, moveRight]
   );
+
+  const handleTouchStart = useCallback(
+    (e: TouchEvent) => {
+      e.preventDefault();
+      const touch = e.touches[0];
+      setStartX(touch.clientX);
+      setStartY(touch.clientY);
+    },
+    [setStartX, setStartY]
+  );
+
+  const handleTouchMove = useCallback(
+    (e: TouchEvent) => {
+      e.preventDefault();
+
+      if (!e.touches.length) return;
+      const touch = e.touches[0];
+      const deltaX = touch.clientX - startX;
+      const deltaY = touch.clientY - startY;
+
+      // 确定滑动方向
+      if (Math.abs(deltaX) > Math.abs(deltaY)) {
+        // 水平方向滑动
+        setDirection(deltaX > 0 ? "ArrowRight" : "ArrowLeft");
+      } else {
+        // 垂直方向滑动
+        setDirection(deltaY > 0 ? "ArrowDown" : "ArrowUp");
+      }
+    },
+    [setDirection, direction]
+  );
+
+  const handleTouchEnd = useCallback(
+    (e: TouchEvent) => {
+      // 处理滑动结束逻辑，例如根据方向执行特定操作
+      e.preventDefault();
+
+      handleInput({ key: direction });
+      // 重置方向
+      setDirection("");
+    },
+    [setDirection, direction, handleInput]
+  );
+
+  const setupInput = useCallback(() => {
+    window.addEventListener("keydown", handleInput, { once: true });
+  }, [handleInput]);
 
   useEffect(() => {
     randomTile();
@@ -250,9 +314,9 @@ export const useGame = (cellState: ICell[], setCellState: any) => {
 
   useEffect(() => {
     setupInput();
-    function setupInput() {
-      window.addEventListener("keydown", handleInput);
-    }
+    // function setupInput() {
+    //   window.addEventListener("keydown", handleInput, { once: true });
+    // }
 
     // function handleInput(e: KeyboardEvent) {
     //   switch (e.key) {
@@ -297,6 +361,19 @@ export const useGame = (cellState: ICell[], setCellState: any) => {
       window.removeEventListener("keydown", handleInput);
     };
   }, [tileState, cellState]);
+
+  useEffect(() => {
+    window.addEventListener("touchstart", handleTouchStart);
+    window.addEventListener("touchmove", handleTouchMove);
+    window.addEventListener("touchend", handleTouchEnd);
+
+    // 组件卸载时的清理工作
+    return () => {
+      window.removeEventListener("touchstart", handleTouchStart);
+      window.removeEventListener("touchmove", handleTouchMove);
+      window.removeEventListener("touchend", handleTouchEnd);
+    };
+  }, [startX, startY, direction]);
 
   useEffect(() => {
     if (!canMoveUp() && !canMoveDown() && !canMoveLeft() && !canMoveRight()) {
