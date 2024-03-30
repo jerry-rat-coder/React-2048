@@ -262,6 +262,7 @@ export const useGame = (cellState: ICell[], setCellState: any) => {
 
   const handleTouchStart = useCallback(
     (e: TouchEvent) => {
+      e.stopPropagation();
       e.preventDefault();
       const touch = e.touches[0];
       setStartX(touch.clientX);
@@ -272,6 +273,8 @@ export const useGame = (cellState: ICell[], setCellState: any) => {
 
   const handleTouchMove = useCallback(
     (e: TouchEvent) => {
+      e.stopPropagation();
+
       e.preventDefault();
 
       if (!e.touches.length) return;
@@ -293,6 +296,8 @@ export const useGame = (cellState: ICell[], setCellState: any) => {
 
   const handleTouchEnd = useCallback(
     (e: TouchEvent) => {
+      e.stopPropagation();
+
       // 处理滑动结束逻辑，例如根据方向执行特定操作
       e.preventDefault();
 

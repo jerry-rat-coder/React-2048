@@ -39,7 +39,6 @@ const Grid = () => {
         <div>
           Attack:<span className="text-green-400">{totalScore}</span>
         </div>
-        {/* <div>best:{bestScore}</div> */}
       </div>
       <div
         className="relative grid grid-cols-4 grid-rows-4 bg-slate-400 rounded-lg"
