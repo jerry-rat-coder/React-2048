@@ -11,7 +11,11 @@ const canAccept = (cell: ICell, tile: ITile): boolean => {
   );
 };
 
-export const useGame = (cellState: ICell[], setCellState: any) => {
+export const useGame = (
+  cellState: ICell[],
+  setCellState: any,
+  setBestScore: any
+) => {
   const [tileState, setTileState] = useState<ITile[]>([]);
   const [startX, setStartX] = useState(0);
   const [startY, setStartY] = useState(0);
@@ -382,9 +386,14 @@ export const useGame = (cellState: ICell[], setCellState: any) => {
 
   useEffect(() => {
     if (!canMoveUp() && !canMoveDown() && !canMoveLeft() && !canMoveRight()) {
+      const res = tileState.reduce((sum, tile) => {
+        return sum + tile.value!;
+      }, 0);
       alert("you lose.");
+      setBestScore(res);
+      localStorage.setItem("BEST_SCORE", JSON.stringify(res));
     }
-  }, [cellState, cellsByColumn, cellsByRow]);
+  }, [cellState, cellsByColumn, cellsByRow, tileState]);
 
   return {
     tileState,

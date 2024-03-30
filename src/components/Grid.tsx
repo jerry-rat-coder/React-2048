@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useGame } from "../hooks/useGame";
 import Cell, { ICell } from "./Cell";
 import Tile from "./Tile";
@@ -23,8 +23,18 @@ function createCells(): ICell[] {
 }
 
 const Grid = () => {
+  const [bestScore, setBestScore] = useState(0);
   const [cellState, setCellState] = useState<ICell[]>(createCells());
-  const { tileState, handleInput } = useGame(cellState, setCellState);
+  const { tileState, handleInput } = useGame(
+    cellState,
+    setCellState,
+    setBestScore
+  );
+
+  useEffect(() => {
+    const best = localStorage.getItem("BEST_SCORE");
+    best == null ? setBestScore(0) : setBestScore(JSON.parse(best));
+  }, []);
 
   const totalScore = useMemo(() => {
     const res = tileState.reduce((sum, tile) => {
@@ -37,7 +47,10 @@ const Grid = () => {
     <>
       <div className="flex flex-col text-3xl white font-semibold text-white justify-center">
         <div>
-          Attack:<span className="text-green-400">{totalScore}</span>
+          Attack:<span className="text-green-400 pl-4">{totalScore}</span>
+        </div>
+        <div>
+          Best:<span className="text-sky-400 pl-4">{bestScore}</span>
         </div>
       </div>
       <div
