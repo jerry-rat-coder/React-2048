@@ -4,6 +4,7 @@ import Cell, { ICell } from "./Cell";
 import Tile from "./Tile";
 import { v4 as uuidv4 } from "uuid";
 import DirectionPad from "./DirectionPad";
+import { useModal } from "../hooks/useModal";
 const GRID_SIZE = 4;
 const CELL_SIZE = 16;
 const GRID_GAP = 2;
@@ -25,6 +26,7 @@ function createCells(): ICell[] {
 const Grid = () => {
   const [bestScore, setBestScore] = useState(0);
   const [cellState, setCellState] = useState<ICell[]>(createCells());
+  const { onOpen } = useModal();
   const { tileState, handleInput } = useGame(
     cellState,
     setCellState,
@@ -43,14 +45,30 @@ const Grid = () => {
     return res;
   }, [tileState]);
 
+  const width_grid = useMemo(
+    () => 4 * CELL_SIZE + 5 * GRID_GAP,
+    [GRID_GAP, GRID_SIZE]
+  );
+
   return (
     <>
-      <div className="flex flex-col text-3xl white font-semibold text-white justify-center">
-        <div>
-          Attack:<span className="text-green-400 pl-4">{totalScore}</span>
+      <div
+        className="flex justify-between items-center text-3xl white font-semibold text-white"
+        style={{ width: `${width_grid}vmin` }}
+      >
+        <div className="flex flex-col">
+          <div>
+            Attack:<span className="text-green-400 pl-4">{totalScore}</span>
+          </div>
+          <div>
+            Best:<span className="text-sky-400 pl-4">{bestScore}</span>
+          </div>
         </div>
-        <div>
-          Best:<span className="text-sky-400 pl-4">{bestScore}</span>
+        <div
+          className="p-4 bg-sky-400 shadow-md   rounded-lg hover:opacity-70 cursor-pointer text-xl"
+          onClick={() => onOpen()}
+        >
+          Help
         </div>
       </div>
       <div

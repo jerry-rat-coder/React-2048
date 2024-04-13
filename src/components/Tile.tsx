@@ -25,7 +25,7 @@ const Tile = ({ x, y, value, cell_size, grid_gap, id }: ITile) => {
   return (
     <div
       key={id}
-      className="absolute  text-black flex justify-center items-center  rounded-lg transition-all duration-200 ease-in-out animate-show"
+      className="absolute  text-black flex justify-center items-center  rounded-lg transition-all duration-100 ease-in-out animate-show"
       style={{
         top: offsetTop,
         left: offsetLeft,

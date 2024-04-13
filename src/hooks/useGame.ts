@@ -21,6 +21,7 @@ export const useGame = (
   const [startY, setStartY] = useState(0);
   const [direction, setDirection] = useState("");
   const [isMoving, setIsMoving] = useState(false);
+  const [isWin, setIsWin] = useState(false);
 
   const cellsByColumn = useMemo(() => {
     const cells = [...cellState];
@@ -212,10 +213,39 @@ export const useGame = (
 
   const handleInput = useCallback(
     (e: any) => {
+      console.log(e.key);
       if (isMoving) {
         return;
       }
       switch (e.key) {
+        case "w":
+          if (!canMoveUp()) {
+            setupInput();
+            return;
+          }
+          moveUp();
+          break;
+        case "s":
+          if (!canMoveDown()) {
+            setupInput();
+            return;
+          }
+          moveDown();
+          break;
+        case "a":
+          if (!canMoveLeft()) {
+            setupInput();
+            return;
+          }
+          moveLeft();
+          break;
+        case "d":
+          if (!canMoveRight()) {
+            setupInput();
+            return;
+          }
+          moveRight();
+          break;
         case "ArrowUp":
           if (!canMoveUp()) {
             setupInput();
@@ -250,7 +280,7 @@ export const useGame = (
       }
       setIsMoving(() => true);
 
-      delay(200).then(() => {
+      delay(100).then(() => {
         setIsMoving(() => false);
         mergeTiles();
 
@@ -267,7 +297,7 @@ export const useGame = (
   const handleTouchStart = useCallback(
     (e: TouchEvent) => {
       e.stopPropagation();
-      e.preventDefault();
+      // e.preventDefault();
       const touch = e.touches[0];
       setStartX(touch.clientX);
       setStartY(touch.clientY);
@@ -279,7 +309,7 @@ export const useGame = (
     (e: TouchEvent) => {
       e.stopPropagation();
 
-      e.preventDefault();
+      // e.preventDefault();
 
       if (!e.touches.length) return;
       const touch = e.touches[0];
@@ -303,7 +333,7 @@ export const useGame = (
       e.stopPropagation();
 
       // 处理滑动结束逻辑，例如根据方向执行特定操作
-      e.preventDefault();
+      // e.preventDefault();
 
       handleInput({ key: direction });
       // 重置方向
@@ -323,48 +353,6 @@ export const useGame = (
 
   useEffect(() => {
     setupInput();
-    // function setupInput() {
-    //   window.addEventListener("keydown", handleInput, { once: true });
-    // }
-
-    // function handleInput(e: KeyboardEvent) {
-    //   switch (e.key) {
-    //     case "ArrowUp":
-    //       if (!canMoveUp()) {
-    //         return;
-    //       }
-    //       moveUp();
-    //       break;
-    //     case "ArrowDown":
-    //       if (!canMoveDown()) {
-    //         return;
-    //       }
-    //       moveDown();
-    //       break;
-    //     case "ArrowLeft":
-    //       if (!canMoveLeft()) {
-    //         return;
-    //       }
-    //       moveLeft();
-    //       break;
-    //     case "ArrowRight":
-    //       if (!canMoveRight()) {
-    //         return;
-    //       }
-    //       moveRight();
-    //       break;
-    //     default:
-    //       return;
-    //   }
-
-    //   delay(200).then(() => {
-    //     mergeTiles();
-
-    //     randomTile();
-    //   });
-
-    //   return;
-    // }
 
     return () => {
       window.removeEventListener("keydown", handleInput);
@@ -385,13 +373,25 @@ export const useGame = (
   }, [startX, startY, direction]);
 
   useEffect(() => {
-    if (!canMoveUp() && !canMoveDown() && !canMoveLeft() && !canMoveRight()) {
+    if (!isWin && Math.max(...tileState.map((tile) => tile.value)) === 2048) {
+      alert("you win");
+      setIsWin(() => true);
+    } else if (
+      !canMoveUp() &&
+      !canMoveDown() &&
+      !canMoveLeft() &&
+      !canMoveRight()
+    ) {
       const res = tileState.reduce((sum, tile) => {
         return sum + tile.value!;
       }, 0);
       alert("you lose.");
-      setBestScore(res);
-      localStorage.setItem("BEST_SCORE", JSON.stringify(res));
+      const best = parseInt(localStorage.getItem("BEST_SCORE") || "0");
+
+      if (res > best) {
+        setBestScore(res);
+        localStorage.setItem("BEST_SCORE", JSON.stringify(res));
+      }
     }
   }, [cellState, cellsByColumn, cellsByRow, tileState]);
 

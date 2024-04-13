@@ -12,7 +12,7 @@ export default {
         },
       },
       animation: {
-        show: "show ease-in-out 200ms",
+        show: "show ease-in-out 100ms",
       },
     },
   },
