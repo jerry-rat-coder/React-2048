@@ -16,16 +16,13 @@ const Modal: React.FC<IModal> = ({ isOpen, onClose, title, body }) => {
     setShowModal(isOpen);
   }, [isOpen]);
 
-  const handleClose = useCallback(
-    (e: any) => {
-      setShowModal(false);
+  const handleClose = useCallback(() => {
+    setShowModal(false);
 
-      setTimeout(() => {
-        onClose();
-      }, 300);
-    },
-    [onClose]
-  );
+    setTimeout(() => {
+      onClose();
+    }, 300);
+  }, [onClose]);
 
   return (
     isOpen && (
