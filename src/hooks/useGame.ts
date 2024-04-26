@@ -3,6 +3,7 @@ import { ICell } from "../components/Cell";
 import { ITile } from "../components/Tile";
 import { v4 as uuidv4 } from "uuid";
 import { delay } from "../utils/delay";
+import { createCells } from "../utils/createCells";
 
 const canAccept = (cell: ICell, tile: ITile): boolean => {
   return (
@@ -22,6 +23,7 @@ export const useGame = (
   const [direction, setDirection] = useState("");
   const [isMoving, setIsMoving] = useState(false);
   const [isWin, setIsWin] = useState(false);
+  const [isRemake, setIsRemake] = useState(false);
 
   const cellsByColumn = useMemo(() => {
     const cells = [...cellState];
@@ -164,7 +166,7 @@ export const useGame = (
         return newCell;
       });
     });
-  }, []);
+  }, [setCellState, setTileState]);
 
   const moveUp = useCallback(() => {
     slideTiles(cellsByColumn);
@@ -346,10 +348,17 @@ export const useGame = (
     window.addEventListener("keydown", handleInput, { once: true });
   }, [handleInput]);
 
+  const remakeGame = useCallback(() => {
+    setTileState(() => []);
+    setCellState(() => createCells());
+
+    setIsRemake((re) => !re);
+  }, [tileState, cellState, randomTile]);
+
   useEffect(() => {
     randomTile();
     randomTile();
-  }, []);
+  }, [isRemake]);
 
   useEffect(() => {
     setupInput();
@@ -377,6 +386,7 @@ export const useGame = (
       alert("you win");
       setIsWin(() => true);
     } else if (
+      cellState.some((cell) => cell.tile != null) &&
       !canMoveUp() &&
       !canMoveDown() &&
       !canMoveLeft() &&
@@ -398,5 +408,6 @@ export const useGame = (
   return {
     tileState,
     handleInput,
+    remakeGame,
   };
 };

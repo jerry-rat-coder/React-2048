@@ -2,32 +2,17 @@ import { useEffect, useMemo, useState } from "react";
 import { useGame } from "../hooks/useGame";
 import Cell, { ICell } from "./Cell";
 import Tile from "./Tile";
-import { v4 as uuidv4 } from "uuid";
 import DirectionPad from "./DirectionPad";
 import { useModal } from "../hooks/useModal";
-const GRID_SIZE = 4;
-const CELL_SIZE = 16;
-const GRID_GAP = 2;
-
-function createCells(): ICell[] {
-  const cells: ICell[] = [];
-  for (let i = 0; i < GRID_SIZE * GRID_SIZE; ++i) {
-    const cell: ICell = {
-      id: uuidv4(),
-      cell_size: CELL_SIZE,
-      x: i % GRID_SIZE,
-      y: Math.floor(i / GRID_SIZE),
-    };
-    cells.push(cell);
-  }
-  return cells;
-}
+import { createCells } from "../utils/createCells";
+import { CELL_SIZE, GRID_GAP, GRID_SIZE } from "../constant";
+import { FiRefreshCw } from "react-icons/fi";
 
 const Grid = () => {
   const [bestScore, setBestScore] = useState(0);
   const [cellState, setCellState] = useState<ICell[]>(createCells());
   const { onOpen } = useModal();
-  const { tileState, handleInput } = useGame(
+  const { tileState, handleInput, remakeGame } = useGame(
     cellState,
     setCellState,
     setBestScore
@@ -63,6 +48,14 @@ const Grid = () => {
           <div>
             Best:<span className="text-sky-400 pl-4">{bestScore}</span>
           </div>
+        </div>
+        <div
+          className="cursor-pointer hover:animate-spin"
+          onClick={() => {
+            remakeGame();
+          }}
+        >
+          <FiRefreshCw color="gray" opacity={0.5} />
         </div>
         <div
           className="p-4 bg-sky-400 shadow-md   rounded-lg hover:opacity-70 cursor-pointer text-xl"

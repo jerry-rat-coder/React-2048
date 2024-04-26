@@ -10,9 +10,15 @@ export default {
             opacity: "0.5",
           },
         },
+        rotateSpin: {
+          to: {
+            transform: "rotate(360deg)",
+          },
+        },
       },
       animation: {
         show: "show ease-in-out 100ms",
+        rotateSpin: "rotateSpin ease-in-out 100ms infinite",
       },
     },
   },
